@@ -1,4 +1,5 @@
 import React, { PureComponent } from "react";
+import socketIOClient from "socket.io-client";
 import logo from "./logo.svg";
 import "./App.css";
 
@@ -7,14 +8,52 @@ class App extends PureComponent {
     super(props);
 
     const { ipcRenderer, clipboard } = this.props.electron;
+    const socket = socketIOClient("http://localhost:8080");
     this.state = {
+      socket,
       clipboard: clipboard.readText(),
     };
 
     ipcRenderer.on("clipboard", (event, arg) => {
-      this.setState({ clipboard: arg });
+      console.log("ipcRenderer clipboard event");
+      this.setState({ clipboard: arg }, () => {
+        const { socket, clipboard } = this.state;
+        socket.emit("clipboard", { id: socket.id, clipboard });
+      });
     });
-    ipcRenderer.send("ready");
+
+    socket.on("connect", () => {
+      console.log(`${socket.id} connected`);
+    });
+
+    socket.on("clipboard", ({ id, clipboard }) => {
+      console.log(`clipboard "${clipboard}" received from ${id}`);
+      this.setState({ clipboard }, () => {
+        const { socket, clipboard } = this.state;
+        console.log(`${socket.id} clipboard: ${clipboard}`);
+      });
+    });
+
+    socket.on("disconnect", () => {
+      console.log(`${socket.id} disconnected`);
+    });
+
+    ipcRenderer.send(`ready`);
+
+    /*
+    const socket = socketIOClient("http://localhost:8080");
+    const { id, clipboard } = this.state;
+    socket.on("connect", () => {
+      console.log(`${id} connected`);
+      socket.emit("clipboard", { id, message: "hello" });
+    });
+    socket.on("clipboard", data => {
+      console.log("clipboard", `${data.id} received "${data.message}"`);
+    });
+    socket.on("disconnect", () => {
+      console.log("disconnect");
+    });
+    */
   }
 
   render() {
