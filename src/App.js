@@ -39,21 +39,6 @@ class App extends PureComponent {
     });
 
     ipcRenderer.send(`ready`);
-
-    /*
-    const socket = socketIOClient("http://localhost:8080");
-    const { id, clipboard } = this.state;
-    socket.on("connect", () => {
-      console.log(`${id} connected`);
-      socket.emit("clipboard", { id, message: "hello" });
-    });
-    socket.on("clipboard", data => {
-      console.log("clipboard", `${data.id} received "${data.message}"`);
-    });
-    socket.on("disconnect", () => {
-      console.log("disconnect");
-    });
-    */
   }
 
   render() {
