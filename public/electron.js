@@ -86,7 +86,7 @@ ipcMain.once("ready", (event, arg) => {
     const newClipboardData = clipboard.readText();
     if (newClipboardData !== clipboardData) {
       clipboardData = newClipboardData;
-      event.sender.send("clipboard", newClipboardData);
+      event.sender.send("copy", newClipboardData);
     }
   }, 250);
 });
