@@ -6,7 +6,7 @@ import { login, getDevices, getChannels } from "./request";
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIO(server);
+const io = socketIO(server, { wsEngine: "ws" });
 
 app.use(express.static(path.join(__dirname, "build")));
 
