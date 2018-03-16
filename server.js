@@ -79,7 +79,7 @@ clipboardSpace.on("connection", async socket => {
       consoleClipboardHistories[consoleLocation]
     );
 
-    socket.emit("clipboard", {
+    clipboardSpace.emit("clipboard", {
       channelNames: rxsInConsole.map(rx => rx.c_name),
       clipboardHistory: consoleClipboardHistories[consoleLocation],
     });
