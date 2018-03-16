@@ -39,18 +39,5 @@ export async function getDevices(query) {
       ...query,
     })}`
   );
-  //console.log("getdevices", response["api_response"].devices.device[0]);
-  return response["api_response"];
-}
-
-export async function getChannels(query) {
-  const response = await fetchXmlToJs(
-    `${aimServerBaseUrl}/api/${buildQueryString({
-      method: "get_channels",
-      v: 6,
-      ...query,
-    })}`
-  );
-  //console.log("getChannels", response["api_response"].channels.channel[0]);
   return response["api_response"];
 }

@@ -2,7 +2,7 @@ import express from "express";
 import http from "http";
 import socketIO from "socket.io";
 import path from "path";
-import { login, getDevices, getChannels } from "./request";
+import { login, getDevices } from "./request";
 
 const app = express();
 const server = http.createServer(app);
