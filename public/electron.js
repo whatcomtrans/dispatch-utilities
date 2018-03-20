@@ -79,14 +79,26 @@ app.on("activate", function() {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 const { clipboard, ipcMain } = electron;
-let clipboardData = clipboard.readText();
 
-ipcMain.once("ready", (event, arg) => {
+ipcMain.once("ready", event => {
+  let clipboardText;
+  let clipboardImage;
+
   setInterval(() => {
-    const newClipboardData = clipboard.readText();
-    if (newClipboardData !== clipboardData) {
-      clipboardData = newClipboardData;
-      event.sender.send("copy", newClipboardData);
+    let newClipboardText = clipboard.readText();
+    let newClipboardImage = clipboard.readImage();
+
+    if (newClipboardText && clipboardText !== newClipboardText) {
+      clipboardImage = null;
+      clipboardText = newClipboardText;
+      event.sender.send("copy-text", clipboardText);
+    } else if (!newClipboardImage.isEmpty()) {
+      newClipboardImage = newClipboardImage.toDataURL();
+      if (clipboardImage !== newClipboardImage) {
+        clipboardText = null;
+        clipboardImage = newClipboardImage;
+        event.sender.send("copy-image", clipboardImage);
+      }
     }
   }, 250);
 });

@@ -17,8 +17,12 @@ class ClipboardHistory extends PureComponent {
       clipboardHistory: [clipboard.readText()],
     };
 
-    ipcRenderer.on("copy", (event, arg) => {
-      socket.emit("copy", { clipboard: arg });
+    ipcRenderer.on("copy-text", (event, arg) => {
+      socket.emit("copy-text", { clipboard: arg });
+    });
+
+    ipcRenderer.on("copy-image", (event, arg) => {
+      socket.emit("copy-image", { clipboard: arg });
     });
 
     socket.on("connect", () => {
@@ -42,13 +46,36 @@ class ClipboardHistory extends PureComponent {
     ipcRenderer.send(`ready`);
   }
 
+  handleCopy = x => {
+    const { clipboard, nativeImage } = this.props.electron;
+    if (x.type === "image") {
+      //console.log("copy image", x.clipboard);
+      clipboard.writeImage(nativeImage.createFromDataURL(x.clipboard));
+    } else {
+      clipboard.writeText(x.clipboard);
+    }
+  };
+
   render() {
     console.log("this.state.clipboardHistory", this.state.clipboardHistory);
     return (
       <div>
         {this.state.clipboardHistory.map((x, i) => (
           <p>
-            {i + 1}. {x}
+            {i === 0 ? "Currently on clipboard: " : `${i}. `}
+            {x.type === "image" ? (
+              <img src={x.clipboard} width="100" height="100" alt="" />
+            ) : (
+              x.clipboard
+            )}
+            {i !== 0 ? (
+              <button
+                style={{ cursor: "pointer" }}
+                onClick={() => this.handleCopy(x)}
+              >
+                Copy
+              </button>
+            ) : null}
           </p>
         ))}
       </div>

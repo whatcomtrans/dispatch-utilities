@@ -38,9 +38,23 @@ function addToConsoleClipboardHistory(clipboardData, consoleClipboardHistory) {
     ? [...consoleClipboardHistory]
     : [];
 
-  newConsoleClipboardHistory.unshift(clipboardData);
-  if (newConsoleClipboardHistory.length > 10) {
-    newConsoleClipboardHistory = newConsoleClipboardHistory.slice(0, 10);
+  const existing = newConsoleClipboardHistory.findIndex(
+    x =>
+      clipboardData.type === x.type && clipboardData.clipboard === x.clipboard
+  );
+
+  if (existing !== -1) {
+    newConsoleClipboardHistory = [
+      clipboardData,
+      ...newConsoleClipboardHistory.slice(0, existing),
+      ...newConsoleClipboardHistory.slice(existing + 1),
+    ];
+  } else {
+    newConsoleClipboardHistory.unshift(clipboardData);
+
+    if (newConsoleClipboardHistory.length > 5) {
+      newConsoleClipboardHistory = newConsoleClipboardHistory.slice(0, 6);
+    }
   }
 
   return newConsoleClipboardHistory;
@@ -70,12 +84,28 @@ clipboardSpace.on("connection", async socket => {
     clipboardHistory: consoleClipboardHistories[consoleLocation] || [],
   });
 
-  socket.on("copy", async ({ clipboard }) => {
+  socket.on("copy-text", async ({ clipboard }) => {
     const rxsInConsole = await getReceiversInConsole(channelName, token);
     const consoleLocation = rxsInConsole[0].d_location;
 
     consoleClipboardHistories[consoleLocation] = addToConsoleClipboardHistory(
-      clipboard,
+      { type: "text", clipboard },
+      consoleClipboardHistories[consoleLocation]
+    );
+
+    clipboardSpace.emit("clipboard", {
+      channelNames: rxsInConsole.map(rx => rx.c_name),
+      clipboardHistory: consoleClipboardHistories[consoleLocation],
+    });
+  });
+
+  socket.on("copy-image", async ({ clipboard }) => {
+    // console.log("clipboard", clipboard);
+    const rxsInConsole = await getReceiversInConsole(channelName, token);
+    const consoleLocation = rxsInConsole[0].d_location;
+
+    consoleClipboardHistories[consoleLocation] = addToConsoleClipboardHistory(
+      { type: "image", clipboard },
       consoleClipboardHistories[consoleLocation]
     );
 
