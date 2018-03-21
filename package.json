@@ -10,7 +10,7 @@
     "server":
       "cross-env NODE_ENV=development nodemon server.js --watch server.js --watch request.js --exec babel-node --presets env --plugins transform-object-rest-spread",
     "build": "node scripts/build.js",
-    "electron-dev": "electron .",
+    "electron-dev": "cross-env NODE_ENV=development electron .",
     "electron-build":
       "electron-builder --win --x64 -c.extraMetadata.main=build/electron.js",
     "preelectron-build": "yarn build"
