@@ -5,12 +5,12 @@
   "main": "public/electron.js",
   "scripts": {
     "start":
-      "concurrently \"yarn react-start\" \"wait-on http://localhost:3000 && yarn electron-dev\"",
-    "build": "node scripts/build.js",
+      "concurrently \"yarn server\" \"wait-on http://localhost:8080 && yarn react-start\" \"wait-on http://localhost:3000 && yarn electron-dev\"",
     "react-start": "cross-env BROWSER=none node scripts/start.js",
     "server":
       "cross-env NODE_ENV=development nodemon server.js --watch server.js --watch request.js --exec babel-node --presets env --plugins transform-object-rest-spread",
-    "electron-dev": "cross-env NODE_ENV=development electron .",
+    "build": "node scripts/build.js",
+    "electron-dev": "electron .",
     "electron-build":
       "electron-builder --win --x64 -c.extraMetadata.main=build/electron.js",
     "preelectron-build": "yarn build"
