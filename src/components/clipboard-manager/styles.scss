@@ -1,0 +1,63 @@
+:local {
+  .clipboard-manager-heading {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .current-clipboard {
+    padding-bottom: 20px;
+    border-bottom: 1px solid gray;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .clipboard-item {
+    position: relative;
+    padding: 10px;
+    border: 1px solid;
+
+    &:not(:last-of-type) {
+      border-bottom: none;
+    }
+
+    &:hover {
+      .copy-button-overlay {
+        display: block;
+      }
+    }
+  }
+
+  .current-clipboard-item {
+    composes: clipboard-item;
+    margin-top: 10px;
+    font-weight: normal;
+  }
+
+  .clipboard-image {
+    max-height: 100px;
+  }
+
+  .clipboard-history-heading {
+    margin: 20px 0;
+    font-weight: bold;
+  }
+
+  .copy-button-overlay {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .copy-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+  }
+}

@@ -1,6 +1,7 @@
-import React, { PureComponent } from "react";
+import React, { PureComponent, Fragment } from "react";
 import io from "socket.io-client";
-
+import styles from "./styles.scss";
+import shortId from "shortid";
 const channelName = "A D1Comp";
 
 class ClipboardHistory extends PureComponent {
@@ -30,7 +31,6 @@ class ClipboardHistory extends PureComponent {
     });
 
     socket.on("clipboard", ({ channelNames, clipboardHistory }) => {
-      console.log(`clipboard "${clipboard}" for ${channelNames}`);
       if (channelNames.includes(channelName)) {
         this.setState({ clipboardHistory }, () => {
           const { clipboardHistory } = this.state;
@@ -49,34 +49,57 @@ class ClipboardHistory extends PureComponent {
   handleCopy = x => {
     const { clipboard, nativeImage } = this.props.electron;
     if (x.type === "image") {
-      //console.log("copy image", x.clipboard);
       clipboard.writeImage(nativeImage.createFromDataURL(x.clipboard));
     } else {
       clipboard.writeText(x.clipboard);
     }
   };
 
+  renderClipboardItem = clipboardItem => {
+    return clipboardItem.type === "image" ? (
+      <img
+        className={styles.clipboardImage}
+        src={clipboardItem.clipboard}
+        alt=""
+      />
+    ) : (
+      <div>{clipboardItem.clipboard}</div>
+    );
+  };
+
   render() {
-    console.log("this.state.clipboardHistory", this.state.clipboardHistory);
     return (
       <div>
-        {this.state.clipboardHistory.map((x, i) => (
-          <p>
-            {i === 0 ? "Currently on clipboard: " : `${i}. `}
-            {x.type === "image" ? (
-              <img src={x.clipboard} width="100" height="100" alt="" />
-            ) : (
-              x.clipboard
+        <div className={styles.clipboardManagerHeading}>Clipboard Manager</div>
+        {this.state.clipboardHistory.map((clipboardItem, i) => (
+          <Fragment key={shortId.generate()}>
+            {i === 0 && (
+              <div className={styles.currentClipboard}>
+                Currently on clipboard:
+                <div className={styles.currentClipboardItem}>
+                  {this.renderClipboardItem(clipboardItem)}
+                </div>
+              </div>
             )}
-            {i !== 0 ? (
-              <button
-                style={{ cursor: "pointer" }}
-                onClick={() => this.handleCopy(x)}
-              >
-                Copy
-              </button>
-            ) : null}
-          </p>
+            {i === 1 && (
+              <div className={styles.clipboardHistoryHeading}>
+                Clipboard History
+              </div>
+            )}
+            {i !== 0 && (
+              <div className={styles.clipboardItem}>
+                {this.renderClipboardItem(clipboardItem)}
+                <div className={styles.copyButtonOverlay}>
+                  <button
+                    className={styles.copyButton}
+                    onClick={() => this.handleCopy(clipboardItem)}
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+            )}
+          </Fragment>
         ))}
       </div>
     );

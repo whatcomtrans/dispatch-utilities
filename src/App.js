@@ -1,11 +1,10 @@
 import React from "react";
-import ClipboardHistory from "./components/clipboard-history";
-import "./App.css";
+import ClipboardManager from "./components/clipboard-manager";
+import styles from "./App.scss";
 
 const App = ({ electron }) => (
-  <div>
-    <div>Clipboard History</div>
-    <ClipboardHistory electron={electron} />
+  <div className={styles.app}>
+    <ClipboardManager electron={electron} />
   </div>
 );
 
