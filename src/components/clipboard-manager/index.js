@@ -4,7 +4,7 @@ import styles from "./styles.scss";
 import shortId from "shortid";
 const channelName = "A D1Comp";
 
-class ClipboardHistory extends PureComponent {
+class ClipboardManager extends PureComponent {
   constructor(props) {
     super(props);
 
@@ -26,21 +26,10 @@ class ClipboardHistory extends PureComponent {
       socket.emit("copy-image", { clipboard: arg });
     });
 
-    socket.on("connect", () => {
-      console.log(`${channelName} connected`);
-    });
-
     socket.on("clipboard", ({ channelNames, clipboardHistory }) => {
       if (channelNames.includes(channelName)) {
-        this.setState({ clipboardHistory }, () => {
-          const { clipboardHistory } = this.state;
-          console.log(`${socket.id} clipboard: ${clipboardHistory[0]}`);
-        });
+        this.setState({ clipboardHistory });
       }
-    });
-
-    socket.on("disconnect", () => {
-      console.log(`${channelName} disconnected`);
     });
 
     ipcRenderer.send(`ready`);
@@ -106,4 +95,4 @@ class ClipboardHistory extends PureComponent {
   }
 }
 
-export default ClipboardHistory;
+export default ClipboardManager;
