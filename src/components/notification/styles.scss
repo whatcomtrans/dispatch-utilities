@@ -1,0 +1,34 @@
+:local {
+  .notification {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1;
+    padding: 10px;
+    color: white;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 1000ms ease-in-out;
+  }
+
+  .entering,
+  .exiting,
+  .exited {
+    composes: notification;
+    opacity: 0;
+  }
+
+  .entered {
+    composes: notification;
+    opacity: 1;
+  }
+
+  .success {
+    background: green;
+  }
+
+  .error {
+    background: red;
+  }
+}

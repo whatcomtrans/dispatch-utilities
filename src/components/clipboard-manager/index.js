@@ -16,6 +16,7 @@ class ClipboardManager extends PureComponent {
 
     this.state = {
       clipboardHistory: [clipboard.readText()],
+      isConnected: false,
     };
 
     ipcRenderer.on("copy-text", (event, arg) => {
@@ -32,16 +33,36 @@ class ClipboardManager extends PureComponent {
       }
     });
 
+    socket.on("connect", () => {
+      this.setState({ isConnected: true });
+      this.props.createNotification({
+        type: "success",
+        content: <div>Connected</div>,
+      });
+    });
+
+    socket.on("disconnect", () => {
+      this.setState({ isConnected: false });
+      this.props.createNotification({
+        type: "error",
+        content: <div>Disconnected</div>,
+      });
+    });
+
     ipcRenderer.send(`ready`);
   }
 
-  handleCopy = x => {
+  onCopy = x => {
     const { clipboard, nativeImage } = this.props.electron;
     if (x.type === "image") {
       clipboard.writeImage(nativeImage.createFromDataURL(x.clipboard));
     } else {
       clipboard.writeText(x.clipboard);
     }
+  };
+
+  onClose = () => {
+    this.setState({ shouldShowNotification: false });
   };
 
   renderClipboardItem = clipboardItem => {
@@ -57,10 +78,12 @@ class ClipboardManager extends PureComponent {
   };
 
   render() {
+    const { clipboardHistory, isConnected } = this.state;
+
     return (
-      <div>
+      <div className={styles.clipboardManager}>
         <div className={styles.clipboardManagerHeading}>Clipboard Manager</div>
-        {this.state.clipboardHistory.map((clipboardItem, i) => (
+        {clipboardHistory.map((clipboardItem, i) => (
           <Fragment key={shortId.generate()}>
             {i === 0 && (
               <div className={styles.currentClipboard}>
@@ -81,7 +104,7 @@ class ClipboardManager extends PureComponent {
                 <div className={styles.copyButtonOverlay}>
                   <button
                     className={styles.copyButton}
-                    onClick={() => this.handleCopy(clipboardItem)}
+                    onClick={() => this.onCopy(clipboardItem)}
                   >
                     Copy
                   </button>
