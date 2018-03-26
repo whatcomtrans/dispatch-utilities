@@ -14,7 +14,14 @@ class App extends Component {
     super(props);
     this.state = {
       notification: defaultNotification,
+      channel: null,
     };
+  }
+
+  async componentDidMount() {
+    const response = await fetch(`/api/channel?comp=${window.hostname}`);
+    const channel = (await response.json()).channel;
+    this.setState({ channel: channel });
   }
 
   showNotification = notification => {
@@ -39,7 +46,7 @@ class App extends Component {
   };
 
   render() {
-    const { notification } = this.state;
+    const { notification, channel } = this.state;
 
     return (
       <div className={styles.app}>
@@ -50,7 +57,12 @@ class App extends Component {
         >
           {notification.content}
         </Notification>
-        <ClipboardManager createNotification={this.showNotification} />
+        {channel && (
+          <ClipboardManager
+            channel={channel}
+            createNotification={this.showNotification}
+          />
+        )}
       </div>
     );
   }

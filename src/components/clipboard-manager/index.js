@@ -2,8 +2,7 @@ import React, { PureComponent, Fragment } from "react";
 import io from "socket.io-client";
 import styles from "./styles.scss";
 import shortId from "shortid";
-const { ipcRenderer, clipboard } = window.electron;
-const channelName = "A D1Comp";
+const { ipcRenderer, clipboard, nativeImage } = window.electron;
 
 class ClipboardManager extends PureComponent {
   constructor(props) {
@@ -11,11 +10,11 @@ class ClipboardManager extends PureComponent {
 
     //const socket = socketIOClient("10.0.0.72:80?");
     const socket = io("http://localhost:8080/clipboard", {
-      query: { channelName: encodeURIComponent(channelName) },
+      query: { channel: encodeURIComponent(this.props.channel) },
     });
 
     this.state = {
-      clipboardHistory: [clipboard.readText()],
+      clipboardHistory: [clipboard.readText() || clipboard.readImage()],
       isConnected: false,
     };
 
@@ -27,8 +26,8 @@ class ClipboardManager extends PureComponent {
       socket.emit("copy-image", { clipboard: arg });
     });
 
-    socket.on("clipboard", ({ channelNames, clipboardHistory }) => {
-      if (channelNames.includes(channelName)) {
+    socket.on("clipboard", ({ channels, clipboardHistory }) => {
+      if (channels.includes(this.props.channel)) {
         this.setState({ clipboardHistory });
       }
     });
@@ -53,7 +52,6 @@ class ClipboardManager extends PureComponent {
   }
 
   onCopy = x => {
-    const { clipboard, nativeImage } = this.props.electron;
     if (x.type === "image") {
       clipboard.writeImage(nativeImage.createFromDataURL(x.clipboard));
     } else {

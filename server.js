@@ -2,7 +2,7 @@ import express from "express";
 import http from "http";
 import socketIO from "socket.io";
 import path from "path";
-import { login, getDevices } from "./request";
+import { login, getDevices, getChannels } from "./request";
 
 const app = express();
 const server = http.createServer(app);
@@ -12,6 +12,11 @@ app.use(express.static(path.join(__dirname, "build")));
 
 app.get("/", function(req, res) {
   res.sendFile(path.join(__dirname, "build", "index.html"));
+});
+
+app.get("/api/channel", async (req, res) => {
+  const channel = await getChannel(req.query.comp, token);
+  res.json({ channel });
 });
 
 const clipboardSpace = io.of("clipboard");
@@ -55,30 +60,40 @@ function addToConsoleClipboardHistory(clipboardData, consoleClipboardHistory) {
   return newConsoleClipboardHistory;
 }
 
+async function getChannel(compName, token) {
+  const { channels } = await getChannels({
+    device_type: "tx",
+    filter_c_description: compName,
+    token,
+  });
+
+  return channels.channel.c_name;
+}
+
 async function getReceivers(token) {
   const { devices: rxs } = await getDevices({ token });
   return rxs;
 }
 
-async function getReceiversInConsole(channelName, token) {
+async function getReceiversInConsole(channel, token) {
   const rxs = await getReceivers(token);
-  const rx = rxs.device.find(rx => rx.c_name === channelName);
+  const rx = rxs.device.find(rx => rx.c_name === channel);
   return rxs.device.filter(r => r.d_location === rx.d_location);
 }
 
 clipboardSpace.on("connection", async socket => {
   const socketId = socket.id;
-  const channelName = decodeURIComponent(socket.handshake.query.channelName);
-  const rxsInConsole = await getReceiversInConsole(channelName, token);
+  const channel = decodeURIComponent(socket.handshake.query.channel);
+  const rxsInConsole = await getReceiversInConsole(channel, token);
   const consoleLocation = rxsInConsole[0].d_location;
 
   socket.emit("clipboard", {
-    channelNames: [channelName],
+    channels: [channel],
     clipboardHistory: consoleClipboardHistories[consoleLocation] || [],
   });
 
   socket.on("copy-text", async ({ clipboard }) => {
-    const rxsInConsole = await getReceiversInConsole(channelName, token);
+    const rxsInConsole = await getReceiversInConsole(channel, token);
     const consoleLocation = rxsInConsole[0].d_location;
 
     consoleClipboardHistories[consoleLocation] = addToConsoleClipboardHistory(
@@ -87,13 +102,13 @@ clipboardSpace.on("connection", async socket => {
     );
 
     clipboardSpace.emit("clipboard", {
-      channelNames: rxsInConsole.map(rx => rx.c_name),
+      channels: rxsInConsole.map(rx => rx.c_name),
       clipboardHistory: consoleClipboardHistories[consoleLocation],
     });
   });
 
   socket.on("copy-image", async ({ clipboard }) => {
-    const rxsInConsole = await getReceiversInConsole(channelName, token);
+    const rxsInConsole = await getReceiversInConsole(channel, token);
     const consoleLocation = rxsInConsole[0].d_location;
 
     consoleClipboardHistories[consoleLocation] = addToConsoleClipboardHistory(
@@ -102,7 +117,7 @@ clipboardSpace.on("connection", async socket => {
     );
 
     clipboardSpace.emit("clipboard", {
-      channelNames: rxsInConsole.map(rx => rx.c_name),
+      channels: rxsInConsole.map(rx => rx.c_name),
       clipboardHistory: consoleClipboardHistories[consoleLocation],
     });
   });

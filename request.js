@@ -41,3 +41,14 @@ export async function getDevices(query) {
   );
   return response["api_response"];
 }
+
+export async function getChannels(query) {
+  const response = await fetchXmlToJs(
+    `${aimServerBaseUrl}/api/${buildQueryString({
+      method: "get_channels",
+      v: 6,
+      ...query,
+    })}`
+  );
+  return response["api_response"];
+}
