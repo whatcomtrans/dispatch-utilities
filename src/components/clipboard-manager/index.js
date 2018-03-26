@@ -2,13 +2,13 @@ import React, { PureComponent, Fragment } from "react";
 import io from "socket.io-client";
 import styles from "./styles.scss";
 import shortId from "shortid";
+const { ipcRenderer, clipboard } = window.electron;
 const channelName = "A D1Comp";
 
 class ClipboardManager extends PureComponent {
   constructor(props) {
     super(props);
 
-    const { ipcRenderer, clipboard } = this.props.electron;
     //const socket = socketIOClient("10.0.0.72:80?");
     const socket = io("http://localhost:8080/clipboard", {
       query: { channelName: encodeURIComponent(channelName) },

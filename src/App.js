@@ -39,7 +39,6 @@ class App extends Component {
   };
 
   render() {
-    const { electron } = this.props;
     const { notification } = this.state;
 
     return (
@@ -51,10 +50,7 @@ class App extends Component {
         >
           {notification.content}
         </Notification>
-        <ClipboardManager
-          electron={electron}
-          createNotification={this.showNotification}
-        />
+        <ClipboardManager createNotification={this.showNotification} />
       </div>
     );
   }
