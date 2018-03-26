@@ -15,7 +15,6 @@ class ClipboardManager extends PureComponent {
 
     this.state = {
       clipboardHistory: [clipboard.readText() || clipboard.readImage()],
-      isConnected: false,
     };
 
     ipcRenderer.on("copy-text", (event, arg) => {
@@ -33,7 +32,6 @@ class ClipboardManager extends PureComponent {
     });
 
     socket.on("connect", () => {
-      this.setState({ isConnected: true });
       this.props.createNotification({
         type: "success",
         content: <div>Connected</div>,
@@ -41,7 +39,6 @@ class ClipboardManager extends PureComponent {
     });
 
     socket.on("disconnect", () => {
-      this.setState({ isConnected: false });
       this.props.createNotification({
         type: "error",
         content: <div>Disconnected</div>,
@@ -76,7 +73,7 @@ class ClipboardManager extends PureComponent {
   };
 
   render() {
-    const { clipboardHistory, isConnected } = this.state;
+    const { clipboardHistory } = this.state;
 
     return (
       <div className={styles.clipboardManager}>

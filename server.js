@@ -2,6 +2,7 @@ import express from "express";
 import http from "http";
 import socketIO from "socket.io";
 import path from "path";
+import "dotenv/config";
 import { login, getDevices, getChannels } from "./request";
 
 const app = express();
@@ -24,7 +25,10 @@ const clipboardSpace = io.of("clipboard");
 let token = null;
 
 try {
-  login({ username: "admin", password: "password" }).then(response => {
+  login({
+    username: process.env.AIM_USERNAME,
+    password: process.env.AIM_PASSWORD,
+  }).then(response => {
     token = response.token;
   });
 } catch (e) {
