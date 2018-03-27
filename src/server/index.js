@@ -43,8 +43,9 @@ function addToConsoleClipboardHistory(clipboardData, consoleClipboardHistory) {
     : [];
 
   const existing = newConsoleClipboardHistory.findIndex(
-    x =>
-      clipboardData.type === x.type && clipboardData.clipboard === x.clipboard
+    clipboardItem =>
+      clipboardData.type === clipboardItem.type &&
+      clipboardData.content === clipboardItem.content
   );
 
   if (existing !== -1) {
@@ -101,7 +102,7 @@ clipboardSpace.on("connection", async socket => {
     const consoleLocation = rxsInConsole[0].d_location;
 
     consoleClipboardHistories[consoleLocation] = addToConsoleClipboardHistory(
-      { type: "text", clipboard },
+      { type: "text", content: clipboard },
       consoleClipboardHistories[consoleLocation]
     );
 
@@ -116,7 +117,7 @@ clipboardSpace.on("connection", async socket => {
     const consoleLocation = rxsInConsole[0].d_location;
 
     consoleClipboardHistories[consoleLocation] = addToConsoleClipboardHistory(
-      { type: "image", clipboard },
+      { type: "image", content: clipboard },
       consoleClipboardHistories[consoleLocation]
     );
 

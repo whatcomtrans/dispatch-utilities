@@ -51,15 +51,17 @@ class ClipboardManager extends PureComponent {
     ipcRenderer.send(`ready`);
   }
 
-  onCopy = x => {
-    if (!x) {
+  onCopy = clipboardItem => {
+    if (!clipboardItem) {
       return;
     }
 
-    if (x.type === "image") {
-      clipboard.writeImage(nativeImage.createFromDataURL(x.clipboard));
+    if (clipboardItem.type === "image") {
+      clipboard.writeImage(
+        nativeImage.createFromDataURL(clipboardItem.content)
+      );
     } else {
-      clipboard.writeText(x.clipboard);
+      clipboard.writeText(clipboardItem.content);
     }
   };
 
@@ -71,11 +73,11 @@ class ClipboardManager extends PureComponent {
     return clipboardItem.type === "image" ? (
       <img
         className={styles.clipboardImage}
-        src={clipboardItem.clipboard}
+        src={clipboardItem.content}
         alt=""
       />
     ) : (
-      <div>{clipboardItem.clipboard}</div>
+      <div>{clipboardItem.content}</div>
     );
   };
 
