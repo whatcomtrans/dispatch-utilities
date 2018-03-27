@@ -26,7 +26,11 @@ class ClipboardManager extends PureComponent {
 
     socket.on("clipboard", ({ channels, clipboardHistory }) => {
       if (channels.includes(this.props.channel)) {
-        this.setState({ clipboardHistory });
+        this.setState({ clipboardHistory }, () => {
+          if (this.state.clipboardHistory.length > 0) {
+            this.onCopy(this.state.clipboardHistory[0]);
+          }
+        });
       }
     });
 
@@ -48,6 +52,10 @@ class ClipboardManager extends PureComponent {
   }
 
   onCopy = x => {
+    if (!x) {
+      return;
+    }
+
     if (x.type === "image") {
       clipboard.writeImage(nativeImage.createFromDataURL(x.clipboard));
     } else {
