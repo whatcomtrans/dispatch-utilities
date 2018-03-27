@@ -4,17 +4,20 @@
   "private": true,
   "main": "./src/client/public/electron.js",
   "scripts": {
-    "start":
-      "concurrently \"yarn server\" \"wait-on http://localhost:8080 && yarn react-start\" \"wait-on http://localhost:3000 && yarn electron-dev\"",
+    "dev":
+      "concurrently \"yarn server-dev\" \"wait-on http://localhost:8080 && yarn react-start\" \"wait-on http://localhost:3000 && yarn electron-dev\"",
+    "server-dev":
+      "cross-env NODE_ENV=development nodemon ./src/server/index.js --watch ./src/server/index.js --watch ./src/server/request.js --exec babel-node --presets env --plugins transform-object-rest-spread",
     "react-start":
       "cross-env BROWSER=none node -r dotenv/config ./src/client/scripts/start.js",
-    "server":
-      "cross-env NODE_ENV=development nodemon ./src/server/index.js --watch ./src/server/index.js --watch ./src/server/request.js --exec babel-node --presets env --plugins transform-object-rest-spread",
-    "build": "node ./src/client/scripts/build.js",
     "electron-dev": "cross-env NODE_ENV=development electron .",
+    "react-build": "node ./src/client/scripts/build.js",
+    "server-build":
+      "cross-env NODE_ENV=production babel ./src/server -d dist/server --presets env --plugins transform-object-rest-spread",
+    "serve": "node dist/server/index.js",
+    "preelectron-build": "yarn react-build",
     "electron-build":
-      "electron-builder --win --x64 -c.extraMetadata.main=build/electron.js",
-    "preelectron-build": "yarn build"
+      "electron-builder --win --x64 -c.extraMetadata.main=build/electron.js"
   },
   "build": {
     "appId": "com.dispatch-utilities",
