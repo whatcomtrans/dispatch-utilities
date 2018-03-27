@@ -19,7 +19,13 @@ class App extends Component {
   }
 
   async componentDidMount() {
-    const response = await fetch(`/api/channel?comp=${window.hostname}`);
+    const response = await fetch(
+      `${
+        process.env.NODE_ENV === "production"
+          ? process.env.REACT_APP_SERVER
+          : ""
+      }/api/channel?comp=${"D1Comp"}`
+    );
     const channel = (await response.json()).channel;
     this.setState({ channel: channel });
   }

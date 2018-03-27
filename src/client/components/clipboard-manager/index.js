@@ -8,8 +8,7 @@ class ClipboardManager extends PureComponent {
   constructor(props) {
     super(props);
 
-    //const socket = socketIOClient("10.0.0.72:80?");
-    const socket = io("http://localhost:8080/clipboard", {
+    const socket = io(`${process.env.REACT_APP_SERVER}/clipboard`, {
       query: { channel: encodeURIComponent(this.props.channel) },
     });
 

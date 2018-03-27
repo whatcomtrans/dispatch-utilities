@@ -6,7 +6,8 @@
   "scripts": {
     "start":
       "concurrently \"yarn server\" \"wait-on http://localhost:8080 && yarn react-start\" \"wait-on http://localhost:3000 && yarn electron-dev\"",
-    "react-start": "cross-env BROWSER=none node ./src/client/scripts/start.js",
+    "react-start":
+      "cross-env BROWSER=none node -r dotenv/config ./src/client/scripts/start.js",
     "server":
       "cross-env NODE_ENV=development nodemon ./src/server/index.js --watch ./src/server/index.js --watch ./src/server/request.js --exec babel-node --presets env --plugins transform-object-rest-spread",
     "build": "node ./src/client/scripts/build.js",
