@@ -1,8 +1,7 @@
 const electron = require("electron");
 const path = require("path");
 const url = require("url");
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
+const { app, BrowserWindow, Tray, Menu } = electron;
 
 let mainWindow;
 
@@ -26,15 +25,37 @@ function createWindow() {
         });
   mainWindow.loadURL(startUrl);
   mainWindow.webContents.openDevTools();
-  mainWindow.on("closed", function() {
-    mainWindow = null;
+  mainWindow.on("close", e => {
+    e.preventDefault();
+    mainWindow.hide();
+  });
+  mainWindow.on("minimize", e => {
+    e.preventDefault();
+    mainWindow.hide();
   });
 }
 
-app.on("ready", createWindow);
+function createTray() {
+  const tray = new Tray(path.join(__dirname, "./icon.ico"));
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: "Quit",
+      click: () => {
+        tray.destroy();
+        app.quit();
+      },
+    },
+  ]);
+  tray.on("click", () => {
+    mainWindow.show();
+  });
+  tray.setToolTip("Dispatch Utilities");
+  tray.setContextMenu(contextMenu);
+}
 
-app.on("window-all-closed", function() {
-  app.quit();
+app.on("ready", () => {
+  createTray();
+  createWindow();
 });
 
 const { clipboard, ipcMain } = electron;
