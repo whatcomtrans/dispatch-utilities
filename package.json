@@ -22,7 +22,7 @@
   "build": {
     "appId": "com.dispatch-utilities",
     "productName": "Dispatch Utilities",
-    "files": ["build/**/*", "node_modules/**/*"],
+    "files": ["build/**/*", "node_modules/**/*", "assets/icon.ico"],
     "directories": {
       "buildResources": "assets"
     }

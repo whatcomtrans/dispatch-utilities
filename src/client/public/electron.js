@@ -4,6 +4,10 @@ const url = require("url");
 const { app, BrowserWindow, Tray, Menu } = electron;
 
 let mainWindow;
+const iconUrl =
+  process.env.NODE_ENV === "development"
+    ? path.join(__dirname, "../../../assets/icon.ico")
+    : path.join(__dirname, "../assets/icon.ico");
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -13,6 +17,7 @@ function createWindow() {
       nodeIntegration: false,
       preload: path.join(__dirname, "preload.js"),
     },
+    icon: iconUrl,
   });
 
   const startUrl =
@@ -36,7 +41,7 @@ function createWindow() {
 }
 
 function createTray() {
-  const tray = new Tray(path.join(__dirname, "./icon.ico"));
+  const tray = new Tray(iconUrl);
   const contextMenu = Menu.buildFromTemplate([
     {
       label: "Quit",
