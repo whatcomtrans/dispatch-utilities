@@ -40,7 +40,9 @@ function createWindow() {
           slashes: true,
         });
   mainWindow.loadURL(startUrl);
-  mainWindow.webContents.openDevTools();
+  if (process.env.NODE_ENV === "development") {
+    mainWindow.webContents.openDevTools();
+  }
   mainWindow.on("close", e => {
     e.preventDefault();
     mainWindow.hide();
