@@ -4,6 +4,17 @@ const url = require("url");
 const { app, BrowserWindow, Tray, Menu } = electron;
 
 let mainWindow;
+
+const isSecondInstance = app.makeSingleInstance(() => {
+  if (mainWindow) {
+    mainWindow.show();
+  }
+});
+
+if (isSecondInstance) {
+  app.quit();
+}
+
 const iconUrl =
   process.env.NODE_ENV === "development"
     ? path.join(__dirname, "../../../assets/icon.ico")
@@ -31,10 +42,6 @@ function createWindow() {
   mainWindow.loadURL(startUrl);
   mainWindow.webContents.openDevTools();
   mainWindow.on("close", e => {
-    e.preventDefault();
-    mainWindow.hide();
-  });
-  mainWindow.on("minimize", e => {
     e.preventDefault();
     mainWindow.hide();
   });
