@@ -63,6 +63,10 @@ app.on("ready", () => {
   createWindow();
 });
 
+app.on("before-quit", () => {
+  mainWindow.removeAllListeners("close");
+});
+
 const { clipboard, ipcMain } = electron;
 
 ipcMain.once("ready", event => {
