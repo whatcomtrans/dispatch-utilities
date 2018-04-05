@@ -24,7 +24,7 @@ class App extends Component {
         process.env.NODE_ENV === "production"
           ? process.env.REACT_APP_SERVER
           : ""
-      }/api/channel?comp=${"D1Comp"}`
+      }/api/channel?comp=${window.hostname}`
     );
     const channel = (await response.json()).channel;
 
