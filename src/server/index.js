@@ -3,6 +3,7 @@ import http from "http";
 import socketIO from "socket.io";
 import path from "path";
 import "dotenv/config";
+import logger from "./logger.js";
 import { login, getDevices, getChannels } from "./request";
 
 const app = express();
@@ -24,16 +25,17 @@ const clipboardSpace = io.of("clipboard");
 
 let token = null;
 
-try {
-  login({
-    username: process.env.AIM_USERNAME,
-    password: process.env.AIM_PASSWORD,
-  }).then(response => {
+login({
+  username: process.env.AIM_USERNAME,
+  password: process.env.AIM_PASSWORD,
+})
+  .then(response => {
     token = response.token;
+    logger.info("Login succeeded", { token });
+  })
+  .catch(error => {
+    logger.error("Login failed", { error });
   });
-} catch (e) {
-  console.log("error", e);
-}
 
 const consoleClipboardHistories = {};
 
@@ -71,6 +73,11 @@ async function getChannel(compName, token) {
     filter_c_description: compName,
     token,
   });
+
+  if (!channels) {
+    logger.error("No channel for computer specified", { compName });
+    return null;
+  }
 
   return channels.channel.c_name;
 }

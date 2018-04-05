@@ -44,7 +44,7 @@ class ClipboardManager extends PureComponent {
     socket.on("disconnect", () => {
       this.props.createNotification({
         type: "error",
-        content: <div>Disconnected</div>,
+        content: <div>Not Connected</div>,
       });
     });
 

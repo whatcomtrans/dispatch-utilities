@@ -27,6 +27,15 @@ class App extends Component {
       }/api/channel?comp=${"D1Comp"}`
     );
     const channel = (await response.json()).channel;
+
+    if (!channel) {
+      this.showNotification({
+        type: "error",
+        content: "Not Connected",
+        isVisible: true,
+      });
+    }
+
     this.setState({ channel: channel });
   }
 

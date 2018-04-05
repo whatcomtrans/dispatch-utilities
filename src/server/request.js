@@ -21,34 +21,41 @@ async function fetchXmlToJs(url) {
 }
 
 export async function login(query) {
-  const response = await fetchXmlToJs(
+  const response = (await fetchXmlToJs(
     `${aimServerBaseUrl}/api/${buildQueryString({
       method: "login",
       v: 6,
       ...query,
     })}`
-  );
-  return response["api_response"];
+  ))["api_response"];
+
+  if (response.success === "0") {
+    throw response.errors.error.msg;
+  }
+
+  return response;
 }
 
 export async function getDevices(query) {
-  const response = await fetchXmlToJs(
+  const response = (await fetchXmlToJs(
     `${aimServerBaseUrl}/api/${buildQueryString({
       method: "get_devices",
       v: 6,
       ...query,
     })}`
-  );
-  return response["api_response"];
+  ))["api_response"];
+
+  return response;
 }
 
 export async function getChannels(query) {
-  const response = await fetchXmlToJs(
+  const response = (await fetchXmlToJs(
     `${aimServerBaseUrl}/api/${buildQueryString({
       method: "get_channels",
       v: 6,
       ...query,
     })}`
-  );
-  return response["api_response"];
+  ))["api_response"];
+
+  return response;
 }
