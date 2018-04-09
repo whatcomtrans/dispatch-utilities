@@ -1,4 +1,5 @@
 import winston from "winston";
+import "winston-daily-rotate-file";
 import path from "path";
 import fs from "fs";
 
@@ -11,16 +12,18 @@ let transports = [
 ];
 
 if (process.env.NODE_ENV === "production") {
-  const logFileDirectory = path.join(__dirname, "/logs");
+  const logFileDirectory = path.join(__dirname, "../../logs");
   if (!fs.existsSync(logFileDirectory)) {
     fs.mkdirSync(logFileDirectory);
   }
 
   transports.push(
-    new winston.transports.File({
+    new winston.transports.DailyRotateFile({
       level: "error",
-      colorize: true,
-      filename: path.join(logFileDirectory, "log.txt"),
+      filename: "winston.log.%DATE%",
+      dirname: logFileDirectory,
+      maxSize: "1mb",
+      maxFiles: "14",
     })
   );
 }
