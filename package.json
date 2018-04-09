@@ -13,7 +13,7 @@
     "electron-dev": "cross-env NODE_ENV=development electron .",
     "react-build": "node ./src/client/scripts/build.js",
     "server-build":
-      "babel ./src/server -d dist/server --presets env --plugins transform-object-rest-spread",
+      "cross-env NODE_ENV=production babel ./src/server -d dist/server --presets env --plugins transform-object-rest-spread",
     "serve": "cross-env NODE_ENV=production node dist/server/index.js",
     "preelectron-build": "yarn react-build",
     "electron-build":
