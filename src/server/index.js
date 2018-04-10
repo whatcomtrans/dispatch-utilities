@@ -94,6 +94,9 @@ async function getReceiversInConsole(channel, token) {
 }
 
 clipboardSpace.on("connection", async socket => {
+  logger.info("Websocket connection", {
+    channel: socket.handshake.query.channel,
+  });
   const socketId = socket.id;
   const channel = decodeURIComponent(socket.handshake.query.channel);
   const rxsInConsole = await getReceiversInConsole(channel, token);
@@ -105,6 +108,7 @@ clipboardSpace.on("connection", async socket => {
   });
 
   socket.on("copy-text", async ({ clipboard }) => {
+    logger.info("Copy text", { channel, clipboard });
     const rxsInConsole = await getReceiversInConsole(channel, token);
     const consoleLocation = rxsInConsole[0].d_location;
 
@@ -120,6 +124,7 @@ clipboardSpace.on("connection", async socket => {
   });
 
   socket.on("copy-image", async ({ clipboard }) => {
+    logger.info("Copy image", { channel, clipboard });
     const rxsInConsole = await getReceiversInConsole(channel, token);
     const consoleLocation = rxsInConsole[0].d_location;
 
