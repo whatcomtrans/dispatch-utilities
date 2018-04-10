@@ -8,9 +8,16 @@ class ClipboardManager extends PureComponent {
   constructor(props) {
     super(props);
 
-    const socket = io(`${process.env.REACT_APP_SERVER}/clipboard`, {
-      query: { channel: encodeURIComponent(this.props.channel) },
-    });
+    const socket = io(
+      `${
+        process.env.NODE_ENV === "production"
+          ? process.env.REACT_APP_SERVER
+          : ""
+      }/clipboard`,
+      {
+        query: { channel: encodeURIComponent(this.props.channel) },
+      }
+    );
 
     this.state = {
       clipboardHistory: [clipboard.readText() || clipboard.readImage()],
