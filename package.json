@@ -25,6 +25,9 @@
     "files": ["build/**/*", "node_modules/**/*", "assets/icon.ico"],
     "directories": {
       "buildResources": "assets"
+    },
+    "nsis": {
+      "artifactName": "${productName} Setup.${ext}"
     }
   },
   "dependencies": {
