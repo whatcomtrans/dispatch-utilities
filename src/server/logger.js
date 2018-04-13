@@ -20,7 +20,7 @@ if (process.env.NODE_ENV === "production") {
   transports.push(
     new winston.transports.DailyRotateFile({
       level: "info",
-      filename: "winston.log.%DATE%",
+      filename: "winston-log-%DATE%.txt",
       dirname: logFileDirectory,
       maxSize: "1mb",
       maxFiles: "14",
