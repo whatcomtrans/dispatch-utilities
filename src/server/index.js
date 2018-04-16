@@ -124,7 +124,7 @@ clipboardSpace.on("connection", async socket => {
   });
 
   socket.on("copy-image", async ({ clipboard }) => {
-    logger.info("Copy image", { channel, clipboard });
+    logger.info("Copy image", { channel });
     const rxsInConsole = await getReceiversInConsole(channel, token);
     const consoleLocation = rxsInConsole[0].d_location;
 
