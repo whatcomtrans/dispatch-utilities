@@ -41,10 +41,13 @@ function createWindow() {
   if (process.env.NODE_ENV === "development") {
     mainWindow.webContents.openDevTools();
   }
+
   mainWindow.on("close", e => {
     e.preventDefault();
     mainWindow.hide();
   });
+
+  mainWindow.hide();
 }
 
 function createTray() {
