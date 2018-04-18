@@ -13,15 +13,21 @@
 For local development:
 
 ```
-REACT_APP_SERVER=http://localhost:8080
 AIM_USERNAME=<username>
 AIM_PASSWORD=<password>
 ```
 
 For production:
 
+Client
+
 ```
 REACT_APP_SERVER=http://<serverip>:<port>
+```
+
+Server
+
+```
 PORT=<port>
 AIM_USERNAME=<username>
 AIM_PASSWORD=<password>
