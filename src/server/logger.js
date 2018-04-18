@@ -24,6 +24,7 @@ if (process.env.NODE_ENV === "production") {
       dirname: logFileDirectory,
       maxSize: "1mb",
       maxFiles: "14",
+      timestamp: () => new Date(),
     })
   );
 }
