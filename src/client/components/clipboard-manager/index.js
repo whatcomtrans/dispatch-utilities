@@ -2,7 +2,8 @@ import React, { PureComponent, Fragment } from "react";
 import io from "socket.io-client";
 import styles from "./styles.scss";
 import shortId from "shortid";
-const { ipcRenderer, clipboard, nativeImage } = window.electron;
+const { ipcRenderer, clipboard, nativeImage, remote } = window.electron;
+const logger = remote.require("electron-log");
 
 class ClipboardManager extends PureComponent {
   constructor(props) {
@@ -24,15 +25,18 @@ class ClipboardManager extends PureComponent {
     };
 
     ipcRenderer.on("copy-text", (event, arg) => {
+      logger.info(`emit copy text from ${this.props.channel} - ${arg}`);
       socket.emit("copy-text", { clipboard: arg });
     });
 
     ipcRenderer.on("copy-image", (event, arg) => {
+      logger.info(`emit copy image from ${this.props.channel}`);
       socket.emit("copy-image", { clipboard: arg });
     });
 
     socket.on("clipboard", ({ channels, clipboardHistory }) => {
       if (channels.includes(this.props.channel)) {
+        logger.info(`${this.props.channel} received clipboard event`);
         this.setState({ clipboardHistory }, () => {
           if (this.state.clipboardHistory.length > 0) {
             this.onCopy(this.state.clipboardHistory[0]);
@@ -42,6 +46,7 @@ class ClipboardManager extends PureComponent {
     });
 
     socket.on("connect", () => {
+      logger.info(`${this.props.channel} connected`);
       this.props.createNotification({
         type: "success",
         content: <div>Connected</div>,
@@ -49,12 +54,14 @@ class ClipboardManager extends PureComponent {
     });
 
     socket.on("disconnect", () => {
+      logger.info(`${this.props.channel} disconnected`);
       this.props.createNotification({
         type: "error",
         content: <div>Not Connected</div>,
       });
     });
 
+    logger.info(`${this.props.channel} ipcRenderer ready`);
     ipcRenderer.send(`ready`);
   }
 
@@ -64,10 +71,14 @@ class ClipboardManager extends PureComponent {
     }
 
     if (clipboardItem.type === "image") {
+      logger.info(`${this.props.channel} write image`);
       clipboard.writeImage(
         nativeImage.createFromDataURL(clipboardItem.content)
       );
     } else {
+      logger.info(
+        `${this.props.channel} write text - ${clipboardItem.content}`
+      );
       clipboard.writeText(clipboardItem.content);
     }
   };

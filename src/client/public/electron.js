@@ -1,7 +1,11 @@
 const electron = require("electron");
 const path = require("path");
 const url = require("url");
+const logger = require("electron-log");
 const { app, BrowserWindow, Tray, Menu } = electron;
+
+logger.transports.file.level = "info";
+logger.transports.file.maxSize = 1000000;
 
 let mainWindow;
 
@@ -69,7 +73,10 @@ function createTray() {
 }
 
 app.on("ready", () => {
+  logger.info("Application ready");
+  logger.info("Creating Tray");
   createTray();
+  logger.info("Creating Window");
   createWindow();
 });
 
@@ -80,6 +87,7 @@ app.on("before-quit", () => {
 const { clipboard, ipcMain } = electron;
 
 ipcMain.once("ready", event => {
+  logger.info("ipcMain ready");
   let clipboardText;
   let clipboardImage;
 
