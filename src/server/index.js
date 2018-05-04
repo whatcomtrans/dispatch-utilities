@@ -118,6 +118,7 @@ clipboardSpace.on("connection", async socket => {
     );
 
     clipboardSpace.emit("clipboard", {
+      originator: channel,
       channels: rxsInConsole.map(rx => rx.c_name),
       clipboardHistory: consoleClipboardHistories[consoleLocation],
     });
@@ -134,6 +135,7 @@ clipboardSpace.on("connection", async socket => {
     );
 
     clipboardSpace.emit("clipboard", {
+      originator: channel,
       channels: rxsInConsole.map(rx => rx.c_name),
       clipboardHistory: consoleClipboardHistories[consoleLocation],
     });

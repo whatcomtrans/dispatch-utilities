@@ -34,11 +34,14 @@ class ClipboardManager extends PureComponent {
       socket.emit("copy-image", { clipboard: arg });
     });
 
-    socket.on("clipboard", ({ channels, clipboardHistory }) => {
+    socket.on("clipboard", ({ originator, channels, clipboardHistory }) => {
       if (channels.includes(this.props.channel)) {
-        logger.info(`${this.props.channel} received clipboard event`);
         this.setState({ clipboardHistory }, () => {
-          if (this.state.clipboardHistory.length > 0) {
+          if (
+            originator !== this.props.channel &&
+            this.state.clipboardHistory.length > 0
+          ) {
+            logger.info(`${this.props.channel} received clipboard event`);
             this.onCopy(this.state.clipboardHistory[0]);
           }
         });

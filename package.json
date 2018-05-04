@@ -1,6 +1,6 @@
 {
   "name": "dispatch-utilities",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "author": "Whatcom Transportation Authority",
   "main": "./src/client/public/electron.js",
