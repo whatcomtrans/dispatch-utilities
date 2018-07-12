@@ -39,25 +39,27 @@ login({
 
 const consoleClipboardHistories = {};
 
-function addToConsoleClipboardHistory(clipboardData, consoleClipboardHistory) {
+function addToConsoleClipboardHistory(clipboardState, consoleClipboardHistory) {
   let newConsoleClipboardHistory = consoleClipboardHistory
     ? [...consoleClipboardHistory]
     : [];
 
   const existing = newConsoleClipboardHistory.findIndex(
     clipboardItem =>
-      clipboardData.type === clipboardItem.type &&
-      clipboardData.content === clipboardItem.content
+      clipboardState.text === clipboardItem.text &&
+      clipboardState.html === clipboardItem.html &&
+      clipboardState.rtf === clipboardItem.rtf &&
+      clipboardState.image === clipboardItem.image
   );
 
   if (existing !== -1) {
     newConsoleClipboardHistory = [
-      clipboardData,
+      clipboardState,
       ...newConsoleClipboardHistory.slice(0, existing),
       ...newConsoleClipboardHistory.slice(existing + 1),
     ];
   } else {
-    newConsoleClipboardHistory.unshift(clipboardData);
+    newConsoleClipboardHistory.unshift(clipboardState);
 
     if (newConsoleClipboardHistory.length > 5) {
       newConsoleClipboardHistory = newConsoleClipboardHistory.slice(0, 6);
@@ -95,8 +97,10 @@ async function getReceiversInConsole(channel, token) {
 
 clipboardSpace.on("connection", async socket => {
   logger.info("Websocket connection", {
-    channel: socket.handshake.query.channel,
+    channel: decodeURIComponent(socket.handshake.query.channel),
+    version: decodeURIComponent(socket.handshake.query.version),
   });
+
   const socketId = socket.id;
   const channel = decodeURIComponent(socket.handshake.query.channel);
   const rxsInConsole = await getReceiversInConsole(channel, token);
@@ -107,30 +111,13 @@ clipboardSpace.on("connection", async socket => {
     clipboardHistory: consoleClipboardHistories[consoleLocation] || [],
   });
 
-  socket.on("copy-text", async ({ clipboard }) => {
-    logger.info("Copy text", { channel, clipboard });
+  socket.on("clipboard", async ({ clipboard }) => {
+    logger.info("Copy", { channel, clipboard });
     const rxsInConsole = await getReceiversInConsole(channel, token);
     const consoleLocation = rxsInConsole[0].d_location;
 
     consoleClipboardHistories[consoleLocation] = addToConsoleClipboardHistory(
-      { type: "text", content: clipboard },
-      consoleClipboardHistories[consoleLocation]
-    );
-
-    clipboardSpace.emit("clipboard", {
-      originator: channel,
-      channels: rxsInConsole.map(rx => rx.c_name),
-      clipboardHistory: consoleClipboardHistories[consoleLocation],
-    });
-  });
-
-  socket.on("copy-image", async ({ clipboard }) => {
-    logger.info("Copy image", { channel });
-    const rxsInConsole = await getReceiversInConsole(channel, token);
-    const consoleLocation = rxsInConsole[0].d_location;
-
-    consoleClipboardHistories[consoleLocation] = addToConsoleClipboardHistory(
-      { type: "image", content: clipboard },
+      clipboard,
       consoleClipboardHistories[consoleLocation]
     );
 

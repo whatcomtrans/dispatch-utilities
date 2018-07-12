@@ -5,7 +5,6 @@ import { Transition } from "react-transition-group";
 const Notification = ({ type, isVisible, children, onExited }) => (
   <Transition in={isVisible} timeout={1000} onExited={onExited}>
     {state => {
-      console.log("state", state);
       return (
         <div
           className={`${styles[state]} ${styles[type]}`}

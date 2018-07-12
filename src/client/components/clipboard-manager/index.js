@@ -2,6 +2,7 @@ import React, { PureComponent, Fragment } from "react";
 import io from "socket.io-client";
 import styles from "./styles.scss";
 import shortId from "shortid";
+import packageJson from "../../../../package.json";
 const { ipcRenderer, clipboard, nativeImage, remote } = window.electron;
 const logger = remote.require("electron-log");
 
@@ -9,6 +10,21 @@ class ClipboardManager extends PureComponent {
   constructor(props) {
     super(props);
 
+    const image = clipboard.readImage();
+
+    this.state = {
+      clipboardHistory: [
+        {
+          text: clipboard.readText(),
+          html: clipboard.readHTML(),
+          rtf: clipboard.readRTF(),
+          image: image && image.toDataURL(),
+        },
+      ],
+    };
+  }
+
+  componentDidMount() {
     const socket = io(
       `${
         process.env.NODE_ENV === "production"
@@ -16,23 +32,12 @@ class ClipboardManager extends PureComponent {
           : ""
       }/clipboard`,
       {
-        query: { channel: encodeURIComponent(this.props.channel) },
+        query: {
+          channel: encodeURIComponent(this.props.channel),
+          version: packageJson.version,
+        },
       }
     );
-
-    this.state = {
-      clipboardHistory: [clipboard.readText() || clipboard.readImage()],
-    };
-
-    ipcRenderer.on("copy-text", (event, arg) => {
-      logger.info(`emit copy text from ${this.props.channel} - ${arg}`);
-      socket.emit("copy-text", { clipboard: arg });
-    });
-
-    ipcRenderer.on("copy-image", (event, arg) => {
-      logger.info(`emit copy image from ${this.props.channel}`);
-      socket.emit("copy-image", { clipboard: arg });
-    });
 
     socket.on("clipboard", ({ originator, channels, clipboardHistory }) => {
       if (channels.includes(this.props.channel)) {
@@ -64,8 +69,36 @@ class ClipboardManager extends PureComponent {
       });
     });
 
-    logger.info(`${this.props.channel} ipcRenderer ready`);
-    ipcRenderer.send(`ready`);
+    setInterval(() => {
+      const clipboardFormats = clipboard.availableFormats();
+      const clipboardState = {};
+
+      for (let i = 0; i < clipboardFormats.length; i++) {
+        const format = clipboardFormats[i];
+        if (format === "text/plain") {
+          clipboardState.text = clipboard.readText();
+        } else if (format === "text/html") {
+          clipboardState.html = clipboard.readHTML();
+        } else if (format === "text/rtf") {
+          clipboardState.rtf = clipboard.readRTF();
+        } else if (format.indexOf("image") > -1) {
+          clipboardState.image = clipboard.readImage().toDataURL();
+        } else {
+          logger.warn("Encountered unsupported clipboard format", format);
+        }
+      }
+
+      let previousClipboardState = this.state.clipboardHistory[0] || {};
+
+      if (
+        previousClipboardState.text !== clipboardState.text ||
+        previousClipboardState.html !== clipboardState.html ||
+        previousClipboardState.rtf !== clipboardState.rtf ||
+        previousClipboardState.image !== clipboardState.image
+      ) {
+        socket.emit("clipboard", { clipboard: clipboardState });
+      }
+    }, 250);
   }
 
   onCopy = clipboardItem => {
@@ -73,17 +106,20 @@ class ClipboardManager extends PureComponent {
       return;
     }
 
-    if (clipboardItem.type === "image") {
-      logger.info(`${this.props.channel} write image`);
-      clipboard.writeImage(
-        nativeImage.createFromDataURL(clipboardItem.content)
-      );
-    } else {
-      logger.info(
-        `${this.props.channel} write text - ${clipboardItem.content}`
-      );
-      clipboard.writeText(clipboardItem.content);
-    }
+    logger.info(
+      `${this.props.channel} wrote to the clipboard: ${JSON.stringify(
+        clipboardItem
+      )}`
+    );
+
+    clipboard.write({
+      text: clipboardItem.text,
+      html: clipboardItem.html,
+      image:
+        clipboardItem.image &&
+        nativeImage.createFromDataURL(clipboardItem.image),
+      rtf: clipboardItem.rtf,
+    });
   };
 
   onClose = () => {
@@ -91,15 +127,17 @@ class ClipboardManager extends PureComponent {
   };
 
   renderClipboardItem = clipboardItem => {
-    return clipboardItem.type === "image" ? (
-      <img
-        className={styles.clipboardImage}
-        src={clipboardItem.content}
-        alt=""
-      />
-    ) : (
-      <div>{clipboardItem.content}</div>
-    );
+    if (clipboardItem.text) {
+      return <div>{clipboardItem.text}</div>;
+    } else if (clipboardItem.image) {
+      return (
+        <img
+          className={styles.clipboardImage}
+          src={clipboardItem.image}
+          alt=""
+        />
+      );
+    }
   };
 
   render() {

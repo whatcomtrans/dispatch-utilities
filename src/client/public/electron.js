@@ -83,29 +83,3 @@ app.on("ready", () => {
 app.on("before-quit", () => {
   mainWindow.removeAllListeners("close");
 });
-
-const { clipboard, ipcMain } = electron;
-
-ipcMain.once("ready", event => {
-  logger.info("ipcMain ready");
-  let clipboardText;
-  let clipboardImage;
-
-  setInterval(() => {
-    let newClipboardText = clipboard.readText();
-    let newClipboardImage = clipboard.readImage();
-
-    if (newClipboardText && clipboardText !== newClipboardText) {
-      clipboardImage = null;
-      clipboardText = newClipboardText;
-      event.sender.send("copy-text", clipboardText);
-    } else if (!newClipboardImage.isEmpty()) {
-      newClipboardImage = newClipboardImage.toDataURL();
-      if (clipboardImage !== newClipboardImage) {
-        clipboardText = null;
-        clipboardImage = newClipboardImage;
-        event.sender.send("copy-image", clipboardImage);
-      }
-    }
-  }, 250);
-});
