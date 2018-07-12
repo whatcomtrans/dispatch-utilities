@@ -46,40 +46,17 @@ function createWindow() {
     mainWindow.webContents.openDevTools();
   }
 
-  mainWindow.on("close", e => {
-    e.preventDefault();
-    mainWindow.hide();
+  mainWindow.on("window-all-closed", () => {
+    app.quit();
   });
-
-  mainWindow.hide();
-}
-
-function createTray() {
-  const tray = new Tray(iconUrl);
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: "Quit",
-      click: () => {
-        tray.destroy();
-        app.quit();
-      },
-    },
-  ]);
-  tray.on("click", () => {
-    mainWindow.show();
-  });
-  tray.setToolTip("Dispatch Utilities");
-  tray.setContextMenu(contextMenu);
 }
 
 app.on("ready", () => {
   logger.info("Application ready");
-  logger.info("Creating Tray");
-  createTray();
   logger.info("Creating Window");
   createWindow();
 });
 
 app.on("before-quit", () => {
-  mainWindow.removeAllListeners("close");
+  mainWindow.removeAllListeners("window-all-closed");
 });
