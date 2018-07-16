@@ -45,9 +45,8 @@ function createWindow() {
   if (process.env.NODE_ENV === "development") {
     mainWindow.webContents.openDevTools();
   }
-
-  mainWindow.on("window-all-closed", () => {
-    app.quit();
+  mainWindow.on("closed", () => {
+    mainWindow = null;
   });
 }
 
@@ -57,6 +56,6 @@ app.on("ready", () => {
   createWindow();
 });
 
-app.on("before-quit", () => {
-  mainWindow.removeAllListeners("window-all-closed");
+app.on("window-all-closed", () => {
+  app.quit();
 });
