@@ -106,11 +106,6 @@ clipboardSpace.on("connection", async socket => {
   const rxsInConsole = await getReceiversInConsole(channel, token);
   const consoleLocation = rxsInConsole[0].d_location;
 
-  socket.emit("clipboard", {
-    channels: [channel],
-    clipboardHistory: consoleClipboardHistories[consoleLocation] || [],
-  });
-
   socket.on("clipboard", async ({ clipboard }) => {
     logger.info("Copy", { channel, clipboard });
     const rxsInConsole = await getReceiversInConsole(channel, token);
