@@ -2,51 +2,44 @@
 
 ### Features
 
-* Clipboard synchronization between workstations in the same dispatch console. **Workstation name must match the description for the channel in the AIM Server**
+- Clipboard synchronization between workstations in the same dispatch console. **Workstation name must match the description for the channel in the AIM Server**
 
 ### Getting Started
 
 1.  Clone this repo and `cd` to folder
-2.  Run `yarn` to install depdendencies
-3.  Add `.env` file to configure environment variables
-
-For local development:
+2.  Run `yarn` or `npm install` to install depdendencies
+3.  Add `.env` file to configure environment variables (only needed for local development)
 
 ```
 AIM_USERNAME=<username>
 AIM_PASSWORD=<password>
 ```
 
-For production:
+Production environment variables are handled by `pm2`. Make sure `PORT`, `AIM_USERNAME`, and `AIM_PASSWORD` defined in the `pm2` config (`pm2.json`).
 
-Client
-
-```
-REACT_APP_SERVER=http://<serverip>:<port>
-```
-
-Server
-
-```
-PORT=<port>
-AIM_USERNAME=<username>
-AIM_PASSWORD=<password>
-```
-
-REACT_APP_SERVER is where you're running the server from.
-PORT is the port the server is running from.
+PORT is the port the server is running from (`3032`).
 AIM server username and password can be found in KeePass.
 
 ### Run Locally
 
-`yarn dev`
+`yarn dev` or `npm run dev`
+
+For debugging, you may want to run the server, webpack-dev-server, and electron app separately.
+
+`yarn server-dev` or `npm run server-dev`
+
+`yarn react-start` or `npm run react-start`
+
+`yarn electron-dev` or `npm run electron-dev`
 
 ### Production build
 
 #### Server
 
-`yarn server-build && yarn serve` starts a Node.js Express server at the port specified in `.env`
+`yarn react-build` or `npm run react-build` to build static files.
+`yarn server-build` or `npm run server-build` to build the server.
+`yarn serve` starts a Node.js Express server.
 
 #### Client
 
-`yarn electron-build` builds an Electron executable (to `/dist`) that can be run on a workstation to install Dispatch Utilities
+`yarn electron-build` or `npm run electron-build` builds the installer (to `/dist`) for the Electron app.
