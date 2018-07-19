@@ -1,0 +1,11 @@
+{
+    "apps": [
+      {
+        "name": "dispatch-utilities-test",
+        "script": "./dist/server/index.js",
+	"env": {	
+		"PORT": "3032"
+	}
+      }
+    ]
+}
