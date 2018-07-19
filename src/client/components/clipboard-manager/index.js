@@ -3,7 +3,7 @@ import io from "socket.io-client";
 import styles from "./styles.scss";
 import shortId from "shortid";
 import packageJson from "../../../../package.json";
-const { ipcRenderer, clipboard, nativeImage, remote } = window.electron;
+const { clipboard, nativeImage, remote } = window.electron;
 const logger = remote.require("electron-log");
 
 class ClipboardManager extends PureComponent {
