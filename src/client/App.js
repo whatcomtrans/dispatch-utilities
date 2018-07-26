@@ -21,9 +21,7 @@ class App extends Component {
   async componentDidMount() {
     const response = await fetch(
       `${
-        process.env.NODE_ENV === "production"
-          ? process.env.REACT_APP_SERVER
-          : ""
+        process.env.NODE_ENV === "production" ? "http://srvwebnode3:3032" : ""
       }/api/channel?comp=${window.hostname}`
     );
     const channel = (await response.json()).channel;

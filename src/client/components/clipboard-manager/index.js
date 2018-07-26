@@ -27,9 +27,7 @@ class ClipboardManager extends PureComponent {
   componentDidMount() {
     const socket = io(
       `${
-        process.env.NODE_ENV === "production"
-          ? process.env.REACT_APP_SERVER
-          : ""
+        process.env.NODE_ENV === "production" ? "http://srvwebnode3:3032" : ""
       }/clipboard`,
       {
         query: {
