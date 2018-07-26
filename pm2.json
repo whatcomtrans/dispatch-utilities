@@ -2,7 +2,7 @@
     "apps": [
       {
         "name": "dispatch-utilities-test",
-        "script": "./dist/server/index.js",
+        "script": "serve.js",
 	"env": {	
 		"PORT": "3032"
 	}
