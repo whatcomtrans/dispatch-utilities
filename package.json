@@ -4,6 +4,7 @@
   "private": true,
   "author": "Whatcom Transportation Authority",
   "main": "./src/client/public/electron.js",
+  "repository": "https://github.com/whatcomtrans/dispatch-utilities",
   "scripts": {
     "dev": "concurrently \"yarn server-dev\" \"wait-on http://localhost:8080 && yarn react-start\" \"wait-on http://localhost:3000 && yarn electron-dev\"",
     "server-dev": "cross-env NODE_ENV=development nodemon ./src/server/index.js --watch ./src/server/index.js --watch ./src/server/request.js --exec babel-node --presets env --plugins transform-object-rest-spread",
@@ -13,7 +14,8 @@
     "server-build": "cross-env NODE_ENV=production babel ./src/server -d dist/server --presets env --plugins transform-object-rest-spread",
     "serve": "cross-env NODE_ENV=production node dist/server/index.js",
     "preelectron-build": "yarn react-build",
-    "electron-build": "electron-builder --win --x64 -c.extraMetadata.main=build/electron.js"
+    "electron-build": "electron-builder --win --x64 -c.extraMetadata.main=build/electron.js",
+    "publish": "electron-build -p always"
   },
   "build": {
     "appId": "com.dispatch-utilities",
@@ -46,6 +48,7 @@
     "dotenv": "^5.0.1",
     "dotenv-expand": "4.2.0",
     "electron-log": "^2.2.14",
+    "electron-updater": "^3.0.3",
     "eslint": "4.10.0",
     "eslint-config-react-app": "^2.1.0",
     "eslint-loader": "1.9.0",
