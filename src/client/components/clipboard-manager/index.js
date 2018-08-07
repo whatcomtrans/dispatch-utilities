@@ -10,17 +10,9 @@ class ClipboardManager extends PureComponent {
   constructor(props) {
     super(props);
 
-    const image = clipboard.readImage();
-
     this.state = {
-      clipboardHistory: [
-        {
-          text: clipboard.readText(),
-          html: clipboard.readHTML(),
-          rtf: clipboard.readRTF(),
-          image: image && image.toDataURL(),
-        },
-      ],
+      clipboardHistory: [],
+      intervalId: null,
     };
   }
 
@@ -37,13 +29,10 @@ class ClipboardManager extends PureComponent {
       }
     );
 
-    socket.on("clipboard", ({ originator, channels, clipboardHistory }) => {
+    socket.on("clipboard", ({ channels, clipboardHistory }) => {
       if (channels.includes(this.props.channel)) {
         this.setState({ clipboardHistory }, () => {
-          if (
-            originator !== this.props.channel &&
-            this.state.clipboardHistory.length > 0
-          ) {
+          if (this.state.clipboardHistory.length > 0) {
             logger.info(`${this.props.channel} received clipboard event`);
             this.onCopy(this.state.clipboardHistory[0]);
           }
@@ -70,7 +59,6 @@ class ClipboardManager extends PureComponent {
     setInterval(() => {
       const clipboardFormats = clipboard.availableFormats();
       const clipboardState = {};
-
       for (let i = 0; i < clipboardFormats.length; i++) {
         const format = clipboardFormats[i];
         if (format === "text/plain") {
@@ -86,7 +74,10 @@ class ClipboardManager extends PureComponent {
         }
       }
 
-      let previousClipboardState = this.state.clipboardHistory[0] || {};
+      let previousClipboardState =
+        (this.state.clipboardHistory.length &&
+          this.state.clipboardHistory[0]) ||
+        {};
 
       if (
         previousClipboardState.text !== clipboardState.text ||
@@ -96,7 +87,7 @@ class ClipboardManager extends PureComponent {
       ) {
         socket.emit("clipboard", { clipboard: clipboardState });
       }
-    }, 250);
+    }, 1000);
   }
 
   onCopy = clipboardItem => {
