@@ -1,6 +1,6 @@
 {
   "name": "dispatch-utilities",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "private": true,
   "author": "Whatcom Transportation Authority",
   "main": "./src/client/public/electron.js",
@@ -29,8 +29,7 @@
     "nsis": {
       "perMachine": true,
       "deleteAppDataOnUninstall": true,
-      "runAfterFinish": false,
-      "artifactName": "${productName} Setup.${ext}"
+      "artifactName": "${productName} ${version} Setup.${ext}"
     }
   },
   "dependencies": {
