@@ -26,6 +26,9 @@
     "directories": {
       "buildResources": "assets"
     },
+    "win": {
+      "target": "msi"
+    },
     "nsis": {
       "perMachine": true,
       "deleteAppDataOnUninstall": true,
