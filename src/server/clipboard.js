@@ -62,6 +62,12 @@ export async function getChannel(compName, token) {
   return channels.channel.c_name;
 }
 
+export async function getDeviceLocation(channel, token) {
+  const { devices: rxs } = await getDevices({ token });
+  const rx = rxs.device.find(rx => rx.c_name === channel);
+  return rx.d_location;
+}
+
 async function getReceiversInConsole(channel, token) {
   const { devices: rxs } = await getDevices({ token });
   const rx = rxs.device.find(rx => rx.c_name === channel);
