@@ -15,6 +15,7 @@ class App extends Component {
     this.state = {
       notification: defaultNotification,
       channel: null,
+      location: null,
     };
   }
 
@@ -24,7 +25,7 @@ class App extends Component {
         process.env.NODE_ENV === "production" ? "http://srvwebnode3:3032" : ""
       }/api/channel?comp=${window.hostname}`
     );
-    const channel = (await response.json()).channel;
+    const { channel, location } = await response.json();
 
     if (!channel) {
       this.showNotification({
@@ -34,7 +35,7 @@ class App extends Component {
       });
     }
 
-    this.setState({ channel: channel });
+    this.setState({ channel, location });
   }
 
   showNotification = notification => {
@@ -59,7 +60,7 @@ class App extends Component {
   };
 
   render() {
-    const { notification, channel } = this.state;
+    const { notification, channel, location } = this.state;
 
     return (
       <div className={styles.app}>
@@ -73,6 +74,7 @@ class App extends Component {
         {channel && (
           <ClipboardManager
             channel={channel}
+            location={location}
             createNotification={this.showNotification}
           />
         )}

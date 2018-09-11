@@ -37,6 +37,14 @@
     composes: clipboard-item;
     margin-top: 10px;
     font-weight: normal;
+
+    &:not(:last-of-type) {
+      border-bottom: 1px solid;
+    }
+  }
+
+  .click-to-call {
+    margin-top: 10px;
   }
 
   .clipboard-image {

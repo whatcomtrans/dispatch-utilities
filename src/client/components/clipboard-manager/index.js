@@ -3,16 +3,31 @@ import io from "socket.io-client";
 import styles from "./styles.scss";
 import shortId from "shortid";
 import packageJson from "../../../../package.json";
+import ClickToCall from "../click-to-call";
+import { findPhoneNumbers } from "libphonenumber-js";
 const { clipboard, nativeImage, remote } = window.electron;
 const logger = remote.require("electron-log");
+const callerDn = "97{0}3";
 
 class ClipboardManager extends PureComponent {
   constructor(props) {
     super(props);
 
+    const { location } = this.props;
+    const locationNumberIndex = location.search(/\d/);
+    const dn = callerDn.replace(
+      "{0}",
+      location.substring(locationNumberIndex, locationNumberIndex + 1)
+    );
+
+    if (locationNumberIndex === -1 || dn.length !== 4) {
+      logger.error("Invalid device location", { location });
+    }
+
     this.state = {
       clipboardHistory: [],
       intervalId: null,
+      dn,
     };
   }
 
@@ -115,6 +130,55 @@ class ClipboardManager extends PureComponent {
     this.setState({ shouldShowNotification: false });
   };
 
+  handleMakeCall = async number => {
+    const { dn } = this.state;
+    fetch(
+      `${
+        process.env.NODE_ENV === "production" ? "http://srvwebnode3:3032" : ""
+      }/api/call`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ number, dn }),
+      }
+    );
+  };
+
+  renderClickToCall = clipboardItem => {
+    if (!clipboardItem.text) {
+      return null;
+    }
+
+    const parsedPhoneNumbers = findPhoneNumbers(
+      clipboardItem.text,
+      "US"
+    ).filter(phoneNumber => phoneNumber.country === "US");
+    if (!parsedPhoneNumbers.length) {
+      return null;
+    }
+
+    const phoneNumbers = parsedPhoneNumbers.map(phoneNumber => ({
+      display: clipboardItem.text.substring(
+        phoneNumber.startsAt,
+        phoneNumber.endsAt
+      ),
+      phone: phoneNumber.phone,
+    }));
+
+    return (
+      <div>
+        {phoneNumbers.map(phoneNumber => (
+          <ClickToCall
+            key={shortId.generate()}
+            display={phoneNumber.display}
+            phoneNumber={phoneNumber.phone}
+            handleMakeCall={this.handleMakeCall}
+          />
+        ))}
+      </div>
+    );
+  };
+
   renderClipboardItem = clipboardItem => {
     if (clipboardItem.text) {
       return <div>{clipboardItem.text}</div>;
@@ -142,6 +206,10 @@ class ClipboardManager extends PureComponent {
                 Currently on clipboard:
                 <div className={styles.currentClipboardItem}>
                   {this.renderClipboardItem(clipboardItem)}
+                </div>
+                <div className={styles.clickToCall}>
+                  Click to call:
+                  {this.renderClickToCall(clipboardItem)}
                 </div>
               </div>
             )}

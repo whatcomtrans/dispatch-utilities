@@ -1,11 +1,11 @@
 {
-    "apps": [
-      {
-        "name": "dispatch-utilities",
-        "script": "serve.js",
-	"env": {	
-		"PORT": "3032"
-	}
+  "apps": [
+    {
+      "name": "dispatch-utilities",
+      "script": "serve.js",
+      "env": {
+        "PORT": "3032"
       }
-    ]
+    }
+  ]
 }
