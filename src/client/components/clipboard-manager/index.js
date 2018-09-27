@@ -4,10 +4,13 @@ import styles from "./styles.scss";
 import shortId from "shortid";
 import packageJson from "../../../../package.json";
 import ClickToCall from "../click-to-call";
-import { findPhoneNumbers } from "libphonenumber-js";
 const { clipboard, nativeImage, remote } = window.electron;
 const logger = remote.require("electron-log");
 const callerDn = "97{0}3";
+var phoneNumberRE = RegExp(
+  "((\\(\\d{3}\\)|\\d{3})(\\s|-)?)?\\d{3}(\\s|-)?\\d{4}",
+  "g"
+);
 
 class ClipboardManager extends PureComponent {
   constructor(props) {
@@ -149,25 +152,22 @@ class ClipboardManager extends PureComponent {
       return null;
     }
 
-    const parsedPhoneNumbers = findPhoneNumbers(
-      clipboardItem.text,
-      "US"
-    ).filter(phoneNumber => phoneNumber.country === "US");
+    let result;
+    let parsedPhoneNumbers = [];
+    while ((result = phoneNumberRE.exec(clipboardItem.text)) !== null) {
+      parsedPhoneNumbers.push({
+        display: result[0].trim(),
+        phone: result[0].replace(/(\(|\)|\s|\-)/g, "").trim(),
+      });
+    }
+
     if (!parsedPhoneNumbers.length) {
       return null;
     }
 
-    const phoneNumbers = parsedPhoneNumbers.map(phoneNumber => ({
-      display: clipboardItem.text.substring(
-        phoneNumber.startsAt,
-        phoneNumber.endsAt
-      ),
-      phone: phoneNumber.phone,
-    }));
-
     return (
       <div>
-        {phoneNumbers.map(phoneNumber => (
+        {parsedPhoneNumbers.map(phoneNumber => (
           <ClickToCall
             key={shortId.generate()}
             display={phoneNumber.display}

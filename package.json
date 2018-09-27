@@ -1,6 +1,6 @@
 {
   "name": "dispatch-utilities",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "private": true,
   "author": "Whatcom Transportation Authority",
   "main": "./src/client/public/electron.js",
@@ -60,7 +60,6 @@
     "file-loader": "1.1.5",
     "fs-extra": "3.0.1",
     "html-webpack-plugin": "2.29.0",
-    "libphonenumber-js": "^1.4.5",
     "moig-node": "git+https://github.com/whatcomtrans/moig-node.git",
     "node-cmd": "^3.0.0",
     "node-fetch": "^2.1.1",
