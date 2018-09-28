@@ -40,7 +40,7 @@ export function setupClipboard(server) {
       );
 
       clipboardSpace.emit("clipboard", {
-        channels: rxsInConsole.map(rx => rx.c_name),
+        channels: rxsInConsole.map(rx => rx.c_name).filter(x => x !== channel),
         clipboardHistory: consoleClipboardHistories[consoleLocation],
       });
     });
