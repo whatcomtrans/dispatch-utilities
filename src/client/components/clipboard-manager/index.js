@@ -92,10 +92,9 @@ class ClipboardManager extends PureComponent {
         }
       }
 
+      const { clipboardHistory } = this.state;
       let previousClipboardState =
-        (this.state.clipboardHistory.length &&
-          this.state.clipboardHistory[0]) ||
-        {};
+        (clipboardHistory.length && clipboardHistory[0]) || {};
 
       if (
         previousClipboardState.text !== clipboardState.text ||
@@ -103,6 +102,9 @@ class ClipboardManager extends PureComponent {
         previousClipboardState.rtf !== clipboardState.rtf ||
         previousClipboardState.image !== clipboardState.image
       ) {
+        this.setState({
+          clipboardHistory: [clipboardState, ...clipboardHistory],
+        });
         socket.emit("clipboard", { clipboard: clipboardState });
       }
     }, 1000);
