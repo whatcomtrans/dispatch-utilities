@@ -48,11 +48,17 @@ export function setupClipboard(server) {
 }
 
 export async function getChannel(compName, token) {
-  const { channels } = await getChannels({
-    device_type: "tx",
-    filter_c_description: compName,
-    token,
-  });
+  let channels;
+  try {
+    const response = await getChannels({
+      device_type: "tx",
+      filter_c_description: compName,
+      token,
+    });
+    channels = response.channels;
+  } catch (error) {
+    logger.error(error);
+  }
 
   if (!channels) {
     logger.error("No channel for computer specified", { compName });
@@ -63,14 +69,38 @@ export async function getChannel(compName, token) {
 }
 
 export async function getDeviceLocation(channel, token) {
-  const { devices: rxs } = await getDevices({ token });
+  let rxs;
+  try {
+    const response = await getDevices({ token });
+    rxs = response.devices;
+  } catch (error) {
+    logger.error(error);
+  }
+
   const rx = rxs.device.find(rx => rx.c_name === channel);
+
+  if (!rx) {
+    logger.error("No receiver for channel", { channel });
+  }
+
   return rx.d_location;
 }
 
 async function getReceiversInConsole(channel, token) {
-  const { devices: rxs } = await getDevices({ token });
+  let rxs;
+  try {
+    const response = await getDevices({ token });
+    rxs = response.devices;
+  } catch (error) {
+    logger.error(error);
+  }
+
   const rx = rxs.device.find(rx => rx.c_name === channel);
+
+  if (!rx) {
+    logger.error("No receiver for channel", { channel });
+  }
+
   return rxs.device.filter(r => r.d_location === rx.d_location);
 }
 

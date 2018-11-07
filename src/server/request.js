@@ -45,6 +45,10 @@ export async function getDevices(query) {
     })}`
   ))["api_response"];
 
+  if (response.success === "0") {
+    throw response.errors.error.msg;
+  }
+
   return response;
 }
 
@@ -56,6 +60,10 @@ export async function getChannels(query) {
       ...query,
     })}`
   ))["api_response"];
+
+  if (response.success === "0") {
+    throw response.errors.error.msg;
+  }
 
   return response;
 }
