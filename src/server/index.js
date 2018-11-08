@@ -4,9 +4,8 @@ import path from "path";
 import "dotenv/config";
 import {
   setupClipboard,
-  getChannel,
-  token,
-  getDeviceLocation,
+  getChannelWithRetry,
+  getDeviceLocationWithRetry,
 } from "./clipboard";
 import { setupMoig, makeCall } from "./moig";
 
@@ -21,8 +20,8 @@ app.get("/", function(req, res) {
 });
 
 app.get("/api/channel", async (req, res) => {
-  const channel = await getChannel(req.query.comp, token);
-  const location = await getDeviceLocation(channel, token);
+  const channel = await getChannelWithRetry(req.query.comp);
+  const location = await getDeviceLocationWithRetry(channel);
   res.json({ channel, location });
 });
 

@@ -2,24 +2,14 @@ import socketIO from "socket.io";
 import logger from "./logger.js";
 import { login, getDevices, getChannels } from "./request";
 
-export let token = null;
+let token = null;
 const consoleClipboardHistories = {};
 
-export function setupClipboard(server) {
+export async function setupClipboard(server) {
   const io = socketIO(server, { wsEngine: "ws" });
   const clipboardSpace = io.of("clipboard");
 
-  login({
-    username: process.env.AIM_USERNAME,
-    password: process.env.AIM_PASSWORD,
-  })
-    .then(response => {
-      token = response.token;
-      logger.info("Login succeeded", { token });
-    })
-    .catch(error => {
-      logger.error("Login failed", { error });
-    });
+  token = await getAuthToken();
 
   clipboardSpace.on("connection", async socket => {
     const channel = decodeURIComponent(socket.handshake.query.channel);
@@ -47,7 +37,27 @@ export function setupClipboard(server) {
   });
 }
 
-export async function getChannel(compName, token) {
+export async function getChannelWithRetry(compName) {
+  return await retryOnAuthError(getChannel, { compName, token });
+}
+
+export async function getDeviceLocationWithRetry(channel) {
+  return await retryOnAuthError(getDeviceLocation, { channel, token });
+}
+
+async function retryOnAuthError(fn, params = {}) {
+  try {
+    return await fn(params);
+  } catch (error) {
+    if (error === "Login required") {
+      token = await getAuthToken();
+    }
+    return await fn(params);
+  }
+}
+
+async function getChannel(params) {
+  const { compName, token } = params;
   let channels;
   try {
     const response = await getChannels({
@@ -57,7 +67,8 @@ export async function getChannel(compName, token) {
     });
     channels = response.channels;
   } catch (error) {
-    logger.error(error);
+    logger.error("getChannel", { error });
+    throw error;
   }
 
   if (!channels) {
@@ -68,13 +79,15 @@ export async function getChannel(compName, token) {
   return channels.channel.c_name;
 }
 
-export async function getDeviceLocation(channel, token) {
+async function getDeviceLocation(params) {
+  const { channel, token } = params;
   let rxs;
   try {
     const response = await getDevices({ token });
     rxs = response.devices;
   } catch (error) {
-    logger.error(error);
+    logger.error("getDeviceLocation", { error });
+    throw error;
   }
 
   const rx = rxs.device.find(rx => rx.c_name === channel);
@@ -93,6 +106,7 @@ async function getReceiversInConsole(channel, token) {
     rxs = response.devices;
   } catch (error) {
     logger.error(error);
+    throw error;
   }
 
   const rx = rxs.device.find(rx => rx.c_name === channel);
@@ -102,6 +116,21 @@ async function getReceiversInConsole(channel, token) {
   }
 
   return rxs.device.filter(r => r.d_location === rx.d_location);
+}
+
+async function getAuthToken() {
+  try {
+    const response = await login({
+      username: process.env.AIM_USERNAME,
+      password: process.env.AIM_PASSWORD,
+    });
+
+    logger.info("Login succeeded", { token: response.token });
+
+    return response.token;
+  } catch (error) {
+    logger.error("Login failed", { error });
+  }
 }
 
 function addToConsoleClipboardHistory(clipboardState, consoleClipboardHistory) {
