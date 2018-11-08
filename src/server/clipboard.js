@@ -45,6 +45,14 @@ export async function getDeviceLocationWithRetry(channel) {
   return await retryOnAuthError(getDeviceLocation, { channel, token });
 }
 
+export async function clearClipboardHistory(channel) {
+  const location = await retryOnAuthError(getDeviceLocation, {
+    channel,
+    token,
+  });
+  consoleClipboardHistories[location] = [];
+}
+
 async function retryOnAuthError(fn, params = {}) {
   try {
     return await fn(params);

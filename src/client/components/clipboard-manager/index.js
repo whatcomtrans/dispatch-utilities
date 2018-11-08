@@ -149,6 +149,22 @@ class ClipboardManager extends PureComponent {
     );
   };
 
+  clearHistory = async () => {
+    fetch(
+      `${
+        process.env.NODE_ENV === "production" ? "http://srvwebnode3:3032" : ""
+      }/api/channel/${this.props.channel}/clearhistory`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+      }
+    );
+
+    this.setState(prevState => ({
+      clipboardHistory: prevState.clipboardHistory.slice(0, 1),
+    }));
+  };
+
   renderClickToCall = clipboardItem => {
     if (!clipboardItem.text) {
       return null;
@@ -217,7 +233,13 @@ class ClipboardManager extends PureComponent {
             )}
             {i === 1 && (
               <div className={styles.clipboardHistoryHeading}>
-                Clipboard History
+                <span>Clipboard History</span>
+                <button
+                  className={styles.clearHistoryButton}
+                  onClick={this.clearHistory}
+                >
+                  Clear
+                </button>
               </div>
             )}
             {i !== 0 && (

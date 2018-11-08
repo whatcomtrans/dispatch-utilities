@@ -6,6 +6,7 @@ import {
   setupClipboard,
   getChannelWithRetry,
   getDeviceLocationWithRetry,
+  clearClipboardHistory,
 } from "./clipboard";
 import { setupMoig, makeCall } from "./moig";
 
@@ -23,6 +24,10 @@ app.get("/api/channel", async (req, res) => {
   const channel = await getChannelWithRetry(req.query.comp);
   const location = await getDeviceLocationWithRetry(channel);
   res.json({ channel, location });
+});
+
+app.post("/api/channel/:channel/clearhistory", async (req, res) => {
+  clearClipboardHistory(req.params.channel);
 });
 
 app.post("/api/call", async (req, res) => {
