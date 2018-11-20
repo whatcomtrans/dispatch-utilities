@@ -1,6 +1,9 @@
 import React, { Component } from "react";
+import Tabs from "./components/tabs";
+import Tab from "./components/tab";
 import Notification from "./components/notification";
 import ClipboardManager from "./components/clipboard-manager";
+import DisplaySwitcher from "./components/display-switcher";
 import styles from "./App.scss";
 
 const defaultNotification = {
@@ -8,6 +11,8 @@ const defaultNotification = {
   content: null,
   isVisible: false,
 };
+
+const consoleRE = /[d]\d/i;
 
 class App extends Component {
   constructor(props) {
@@ -61,6 +66,12 @@ class App extends Component {
 
   render() {
     const { notification, channel, location } = this.state;
+    let consoleStation;
+
+    if (channel) {
+      const match = channel.match(consoleRE);
+      consoleStation = match && match[0].toLowerCase();
+    }
 
     return (
       <div className={styles.app}>
@@ -72,11 +83,18 @@ class App extends Component {
           {notification.content}
         </Notification>
         {channel && (
-          <ClipboardManager
-            channel={channel}
-            location={location}
-            createNotification={this.showNotification}
-          />
+          <Tabs>
+            <Tab label="Clipboard">
+              <ClipboardManager
+                channel={channel}
+                location={location}
+                createNotification={this.showNotification}
+              />
+            </Tab>
+            <Tab label="Displays" lazyLoad={true}>
+              <DisplaySwitcher consoleStation={consoleStation} />
+            </Tab>
+          </Tabs>
         )}
       </div>
     );

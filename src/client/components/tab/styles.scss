@@ -1,0 +1,19 @@
+:local {
+  .tab {
+    display: inline-block;
+    border: 1px solid transparent;
+    border-bottom: none;
+    margin-bottom: -1px;
+    padding: 20px;
+    cursor: pointer;
+  }
+
+  .active-tab {
+    composes: tab;
+    border: 1px solid grey;
+    border-bottom: none;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background: white;
+  }
+}
